@@ -51,9 +51,11 @@ class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/test/:testId',
+        path: '/test/:testId/:moduleId/:courseId', 
         builder: (_, state) => TestScreen(
           testId: state.pathParameters['testId']!,
+          moduleId: state.pathParameters['moduleId']!,
+          courseId: state.pathParameters['courseId']!,
         ),
       ),
 

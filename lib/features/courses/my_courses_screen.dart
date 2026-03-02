@@ -20,7 +20,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> with SingleTickerProv
   late TabController _tabController;
   late final EnrollmentService _enrollService;
   late final CourseService _courseService;
-  String _userId = '';
+  final Map<String, Course?> _courseCache = {};
 
   @override
   void initState() {
@@ -28,13 +28,27 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> with SingleTickerProv
     _tabController = TabController(length: 2, vsync: this);
     _enrollService = context.read<EnrollmentService>();
     _courseService = context.read<CourseService>();
-    _userId = context.read<AuthService>().currentUser?.id ?? '';
+  }
+
+  Future<void> _loadCourse(String courseId) async {
+    if (!_courseCache.containsKey(courseId)) {
+      final course = await _courseService.getCourseById(courseId);
+      if (mounted) {
+        setState(() {
+          _courseCache[courseId] = course;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_userId.isEmpty) {
-      return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
+    final userId = context.read<AuthService>().currentUser?.id;
+
+    if (userId == null) {
+      return const Scaffold(
+        body: Center(child: Text('Пользователь не авторизован')),
+      );
     }
 
     return Scaffold(
@@ -52,32 +66,52 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> with SingleTickerProv
         ),
       ),
       body: StreamBuilder<List<Enrollment>>(
-        stream: _enrollService.getUserEnrollmentsStream(_userId),
+        stream: _enrollService.getUserEnrollmentsStream(userId),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          print('📊 Stream state: ${snapshot.connectionState}');
+          print('📊 Has data: ${snapshot.hasData}');
+          print('📊 Data: ${snapshot.data}');
+          print('📊 Error: ${snapshot.error}');
+          
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingIndicator();
           }
-          final enrollments = snapshot.data ?? [];
-          if (enrollments.isEmpty) {
-            return const Center(child: Text('Вы ещё не записаны на курсы'));
-          }
-          final inProgress = enrollments.where((e) => e.status.name == 'in_progress').toList();
-          final completed = enrollments.where((e) => e.status.name == 'completed').toList();
-          return FutureBuilder<Map<String, Course?>>(
-            future: _loadCourses(enrollments),
-            builder: (context, courseSnap) {
-              if (!courseSnap.hasData) {
-                return const LoadingIndicator();
-              }
-              final courseMap = courseSnap.data!;
-              return TabBarView(
-                controller: _tabController,
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildList(inProgress, courseMap),
-                  _buildList(completed, courseMap),
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Ошибка: ${snapshot.error}'),
                 ],
-              );
-            },
+              ),
+            );
+          }
+
+          final enrollments = snapshot.data ?? [];
+          
+          if (enrollments.isEmpty) {
+            return const Center(
+              child: Text('Вы ещё не записаны на курсы'),
+            );
+          }
+
+          // Загружаем курсы
+          for (var e in enrollments) {
+            _loadCourse(e.courseId);
+          }
+
+          final inProgress = enrollments.where((e) => e.status == EnrollmentStatus.inProgress).toList();
+          final completed = enrollments.where((e) => e.status == EnrollmentStatus.completed).toList();
+
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _buildList(inProgress, 'В процессе'),
+              _buildList(completed, 'Завершено'),
+            ],
           );
         },
       ),
@@ -85,39 +119,37 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> with SingleTickerProv
     );
   }
 
-  Future<Map<String, Course?>> _loadCourses(List<Enrollment> enrollments) async {
-    final Map<String, Course?> map = {};
-    for (var e in enrollments) {
-      map[e.courseId] = await _courseService.getCourseById(e.courseId);
-    }
-    return map;
-  }
-
-  Widget _buildList(List<Enrollment> enrollments, Map<String, Course?> courseMap) {
+  Widget _buildList(List<Enrollment> enrollments, String emptyMessage) {
     if (enrollments.isEmpty) {
-      return const Center(child: Text('Нет курсов'));
+      return Center(child: Text('Нет курсов'));
     }
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: enrollments.length,
       itemBuilder: (_, i) {
         final e = enrollments[i];
-        final course = courseMap[e.courseId];
+        final course = _courseCache[e.courseId];
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
-            title: Text(course?.title ?? 'Загрузка...'),
+            contentPadding: const EdgeInsets.all(16),
+            title: Text(
+              course?.title ?? 'Загрузка...',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 LinearProgressIndicator(
                   value: e.progressPercent / 100,
                   backgroundColor: Colors.grey[300],
                   valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
                 const SizedBox(height: 4),
-                Text('${e.progressPercent}% • Этап ${(e.progressPercent / 10).round()}/10'),
+                Text('${e.progressPercent}% завершено'),
               ],
             ),
             onTap: () => context.push('/course/${e.courseId}'),

@@ -13,7 +13,6 @@ import '../../widgets/course_card.dart';
 import '../../widgets/accreditation_card.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../core/constants/colors.dart';
-import '../../core/utils/date_formatter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,16 +97,21 @@ class _HomeScreenState extends State<HomeScreen> {
             StreamBuilder<List<Enrollment>>(
               stream: _enrollmentService.getUserEnrollmentsStream(userId),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                print('🏠 Home stream: ${snapshot.connectionState}, data: ${snapshot.data}');
+                
+                if (!snapshot.hasData) {
                   return const LoadingIndicator();
                 }
-                final enrollments = snapshot.data ?? [];
+                
+                final enrollments = snapshot.data!;
+                
                 if (enrollments.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(16),
                     child: Text('Вы ещё не записаны на курсы'),
                   );
                 }
+                
                 return SizedBox(
                   height: 220,
                   child: ListView.builder(
@@ -138,7 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-          const SizedBox(height: 16),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Text('Аккредитация', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
