@@ -1,16 +1,44 @@
-# med_train
+# О проекте
 
-Medical staff training and accreditation system
+MedTrain — это информационная система для дистанционного обучения и сопровождения профессиональной аккредитации медицинского персонала. Разработана в рамках дипломной работы студентки 4 курса Тульского государственного педагогического университета им. Л.Н. Толстого.
 
-## Getting Started
+## Технологический стек
 
-This project is a starting point for a Flutter application.
+Frontend: Flutter (Dart)
+Backend: Supabase (PostgreSQL, Auth, Storage)
+Архитектура: Clean Architecture + MVVM
+Управление состоянием: Provider
+Навигация: GoRouter
+База данных: PostgreSQL + RLS политики
 
-A few resources to get you started if this is your first Flutter project:
+## Установка и запуск
+git clone https://github.com/Alegro-s/med_train.git
+cd med_train
+flutter pub get
+flutter run -d windows
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Структура проекта
+lib/
+├── core/                 # Ядро приложения
+│   ├── constants/        # Константы и цвета
+│   ├── theme/            # Тема оформления
+│   ├── router/           # Маршрутизация
+│   └── utils/            # Вспомогательные функции
+├── models/               # Модели данных
+├── services/             # Сервисы для работы с Supabase
+├── widgets/              # Переиспользуемые виджеты
+└── features/             # Функциональные модули
+    ├── auth/             # Авторизация
+    ├── home/             # Главный экран
+    ├── courses/          # Курсы и обучение
+    ├── accreditation/    # Аккредитация
+    ├── profile/          # Профиль пользователя
+    └── notifications/    # Уведомления
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Автор
+Богомолова Полина Александровна
+Студентка 4 курса, группа 1521721
+
+## Контакты
+GitHub: @Alegro-s
+Email: rozalityai@gmail.com
