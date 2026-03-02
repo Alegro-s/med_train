@@ -92,7 +92,7 @@ class _ModuleScreenState extends State<ModuleScreen> {
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: color.withValues(alpha: 0.1), // Исправлено: withOpacity -> withValues
+                    backgroundColor: color.withValues(alpha: 0.1), 
                     child: Icon(icon, color: color),
                   ),
                   title: Text(m.title),

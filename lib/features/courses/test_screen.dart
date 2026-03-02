@@ -64,7 +64,7 @@ class _TestScreenState extends State<TestScreen> {
     final userId = context.read<AuthService>().currentUser!.id;
     final totalQuestions = _questions.length;
     final percentage = (correct / totalQuestions) * 100;
-    final isPassed = percentage >= 70; // проходной балл 70%
+    final isPassed = percentage >= 70;
 
     final result = TestResult(
       id: '',
@@ -82,7 +82,6 @@ class _TestScreenState extends State<TestScreen> {
       _submitted = true;
     });
 
-    // Возвращаем результат на предыдущий экран
     if (isPassed && mounted) {
       Navigator.pop(context, true);
     }

@@ -4,7 +4,6 @@ import '../models/enrollment_model.dart';
 class EnrollmentService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  // Для одноразовой загрузки (Future)
   Future<List<Enrollment>> getUserEnrollments(String userId) async {
     try {
       final response = await _supabase
@@ -21,7 +20,6 @@ class EnrollmentService {
     }
   }
 
-  // Для автоматического обновления (Stream)
   Stream<List<Enrollment>> getUserEnrollmentsStream(String userId) {
     return _supabase
         .from('enrollments')

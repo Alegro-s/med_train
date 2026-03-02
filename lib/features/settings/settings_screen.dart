@@ -46,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: _darkMode,
             onChanged: (val) {
               setState(() => _darkMode = val);
-              // Здесь можно переключать тему приложения
             },
           ),
           const Divider(),

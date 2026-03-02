@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProgressWidget extends StatelessWidget {
-  final double progress; // 0..1
+  final double progress; 
   final Color? color;
 
   const ProgressWidget({super.key, required this.progress, this.color});

@@ -31,7 +31,7 @@ class Enrollment {
   });
 
   factory Enrollment.fromJson(Map<String, dynamic> json) {
-    print('📦 Парсим Enrollment: $json'); // добавим отладку
+    print('📦 Парсим Enrollment: $json'); 
     
     String statusStr = json['status'] ?? 'in_progress';
     EnrollmentStatus status;
