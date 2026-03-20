@@ -22,7 +22,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   File? _selectedFile;
   String? _fileName;
   bool _isUploading = false;
-  String? _selectedAccreditationId;
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +208,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                   ],
                 ),
               ),
+
               const Text(
                 'Текущая аккредитация',
                 style: TextStyle(
@@ -259,11 +259,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     );
   }
 
-  void _showUploadDialog(
-    BuildContext context,
-    AccreditationService service,
-    String userId,
-  ) {
+  void _showUploadDialog(BuildContext context, AccreditationService service, String userId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -286,24 +282,13 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Тип документа',
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedAccreditationId,
-                items: [
-                  const DropdownMenuItem(
-                    value: 'new',
-                    child: Text('Новая аккредитация'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() => _selectedAccreditationId = value);
-                },
-              ),
               
+              const Text(
+                'Поддерживаемые форматы: PDF, JPG, PNG',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
               const SizedBox(height: 16),
+              
               if (_selectedFile == null) ...[
                 OutlinedButton.icon(
                   onPressed: _isUploading ? null : _pickFile,
@@ -357,6 +342,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
               ],
               
               const SizedBox(height: 24),
+              
               ElevatedButton.icon(
                 onPressed: (_selectedFile == null || _isUploading) 
                     ? null 
@@ -383,6 +369,13 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                             ),
                           );
                           setState(() {});
+                        } else if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Ошибка загрузки документа'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
                         }
                       },
                 icon: _isUploading
@@ -463,7 +456,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                 const SizedBox(height: 8),
                 TextButton.icon(
                   onPressed: () {
-                    // Открыть документ
                   },
                   icon: const Icon(Icons.download),
                   label: Text(acc.documentName ?? 'Скачать документ'),
@@ -526,6 +518,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         return AppColors.error;
       case AccreditationStatus.pending:
         return Colors.orange;
+      default:
+        return AppColors.textSecondary;
     }
   }
 
@@ -537,6 +531,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         return Icons.error;
       case AccreditationStatus.pending:
         return Icons.pending;
+      default:
+        return Icons.help_outline;
     }
   }
 
@@ -548,6 +544,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         return 'Просрочена';
       case AccreditationStatus.pending:
         return 'На проверке';
+      default:
+        return 'Неизвестно';
     }
   }
 

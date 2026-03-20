@@ -18,10 +18,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
     final profile = auth.currentProfile;
+    final isAdmin = profile?.role.name == 'admin';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Настройки'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -40,6 +43,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => context.push('/profile'),
           ),
           const Divider(),
+          
+          if (isAdmin) ...[
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.admin_panel_settings, color: AppColors.primary),
+              ),
+              title: const Text('Админ-панель'),
+              subtitle: const Text('Управление пользователями и аккредитациями'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => context.push('/admin'),
+            ),
+            const Divider(),
+          ],
+          
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode),
             title: const Text('Тёмная тема'),
@@ -72,6 +94,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildBottomNavBar(BuildContext context, int currentIndex) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final isAdmin = auth.currentProfile?.role.name == 'admin';
+    
     return BottomNavigationBar(
       currentIndex: currentIndex,
       type: BottomNavigationBarType.fixed,
@@ -91,13 +116,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           case 3:
             context.go('/settings');
             break;
+          case 4:
+            context.go('/admin');
+            break;
         }
       },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Главная'),
-        BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Доступные'),
-        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Мои'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Настройки'),
+      items: [
+        const BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Главная'),
+        const BottomNavigationBarItem(icon: Icon(Icons.menu_book_outlined), label: 'Доступные'),
+        const BottomNavigationBarItem(icon: Icon(Icons.school_outlined), label: 'Мои'),
+        const BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: 'Настройки'),
+        if (isAdmin)
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.admin_panel_settings),
+            label: 'Админ',
+          ),
       ],
     );
   }

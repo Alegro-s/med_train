@@ -38,8 +38,13 @@ class _AdminPanelState extends State<AdminPanel> {
     final user = context.read<AuthService>().currentProfile;
     
     if (user?.role.name != 'admin') {
-      return const Scaffold(
-        body: Center(
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Панель администратора'),
+          backgroundColor: AppColors.darkHeader,
+          foregroundColor: Colors.white,
+        ),
+        body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -63,6 +68,10 @@ class _AdminPanelState extends State<AdminPanel> {
         backgroundColor: AppColors.darkHeader,
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -189,7 +198,6 @@ class _AdminPanelState extends State<AdminPanel> {
               subtitle: 'Управление сотрудниками и их ролями',
               color: Colors.blue,
               onTap: () {
-                // Навигация к управлению пользователями
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Раздел в разработке'),
@@ -206,7 +214,6 @@ class _AdminPanelState extends State<AdminPanel> {
               subtitle: 'Управление учебными материалами',
               color: Colors.purple,
               onTap: () {
-                // Навигация к управлению курсами
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Раздел в разработке'),
@@ -223,24 +230,6 @@ class _AdminPanelState extends State<AdminPanel> {
               subtitle: 'Статистика и аналитика',
               color: Colors.orange,
               onTap: () {
-                // Навигация к отчётам
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Раздел в разработке'),
-                  ),
-                );
-              },
-            ),
-            
-            const Divider(height: 24),
-            
-            _buildMenuItem(
-              icon: Icons.settings,
-              title: 'Настройки системы',
-              subtitle: 'Общие настройки платформы',
-              color: Colors.grey,
-              onTap: () {
-                // Навигация к настройкам
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Раздел в разработке'),

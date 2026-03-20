@@ -1,3 +1,4 @@
+// lib/core/router/app_router.dart
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
@@ -32,12 +33,10 @@ class AppRouter {
     routes: [
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
-
       GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
       GoRoute(path: '/available', builder: (_, __) => const AvailableCoursesScreen()),
       GoRoute(path: '/my-courses', builder: (_, __) => const MyCoursesScreen()),
       GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
-
       GoRoute(
         path: '/course/:id',
         builder: (_, state) => CourseDetailScreen(
@@ -58,7 +57,6 @@ class AppRouter {
           courseId: state.pathParameters['courseId']!,
         ),
       ),
-
       GoRoute(path: '/accreditation', builder: (_, __) => const AccreditationScreen()),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
       GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
