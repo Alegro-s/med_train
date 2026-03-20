@@ -1,4 +1,21 @@
-enum UserRole { student, teacher, admin }
+import 'package:flutter/material.dart';
+
+enum UserRole { admin, teacher, student, staff }
+
+extension UserRoleExtension on UserRole {
+  String get name {
+    switch (this) {
+      case UserRole.admin:
+        return 'admin';
+      case UserRole.teacher:
+        return 'teacher';
+      case UserRole.student:
+        return 'student';
+      case UserRole.staff:
+        return 'staff';
+    }
+  }
+}
 
 class UserProfile {
   final String id;
@@ -7,7 +24,8 @@ class UserProfile {
   final String? middleName;
   final String? organization;
   final UserRole role;
-  final DateTime createdAt;
+  final String? position; 
+  final String? department; 
 
   UserProfile({
     required this.id,
@@ -16,30 +34,47 @@ class UserProfile {
     this.middleName,
     this.organization,
     required this.role,
-    required this.createdAt,
+    this.position,
+    this.department,
   });
 
+  String get fullName => '$lastName $firstName ${middleName ?? ''}'.trim();
+
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    String roleStr = json['role'] ?? 'student';
+    UserRole role;
+    
+    try {
+      role = UserRole.values.firstWhere(
+        (e) => e.name == roleStr,
+        orElse: () => UserRole.student,
+      );
+    } catch (e) {
+      role = UserRole.student;
+    }
+
     return UserProfile(
-      id: json['id'],
+      id: json['id'] ?? '',
       lastName: json['last_name'] ?? '',
       firstName: json['first_name'] ?? '',
       middleName: json['middle_name'],
       organization: json['organization'],
-      role: UserRole.values.firstWhere((e) => e.name == json['role']),
-      createdAt: DateTime.parse(json['created_at']),
+      role: role,
+      position: json['position'],
+      department: json['department'],
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'last_name': lastName,
-    'first_name': firstName,
-    'middle_name': middleName,
-    'organization': organization,
-    'role': role.name,
-    'created_at': createdAt.toIso8601String(),
-  };
-
-  String get fullName => '$lastName $firstName ${middleName ?? ''}'.trim();
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'last_name': lastName,
+      'first_name': firstName,
+      'middle_name': middleName,
+      'organization': organization,
+      'role': role.name,
+      'position': position,
+      'department': department,
+    };
+  }
 }
